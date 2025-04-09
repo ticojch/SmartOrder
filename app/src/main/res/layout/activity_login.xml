@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="@color/full_black">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center|top"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="32dp"
+        tools:layout_editor_absoluteY="16dp"
+        android:layout_margin="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textColor="@color/red"
+            android:textSize="30dp"/>
+
+        <EditText
+
+            android:id="@+id/inputEmail"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:hint="Correo Electronico"
+            android:inputType="textEmailAddress"
+            android:textColorHint="@color/gray_hint" />
+
+        <EditText
+            android:id="@+id/inputPass"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Contraseña"
+            android:textColorHint="@color/gray_hint"
+            android:inputType="textEmailAddress"
+            android:layout_marginTop="20dp"
+            />
+
+        <Button
+            android:id="@+id/btnIniciarSesion"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:text="@string/action_sign_in_short"
+            android:backgroundTint="@color/red"
+            android:layout_marginTop="40dp"
+            />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
