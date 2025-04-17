@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "449618963923",
-    "project_id": "smarttablet-e502c",
-    "storage_bucket": "smarttablet-e502c.firebasestorage.app"
+    "project_number": "351625295594",
+    "project_id": "smartorder-f0af8",
+    "storage_bucket": "smartorder-f0af8.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:449618963923:android:df8b32dd2f0aef17d51326",
+        "mobilesdk_app_id": "1:351625295594:android:e6eaa3bafa79f53693c993",
         "android_client_info": {
           "package_name": "com.ticojch.tfgdam"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA9QKDI6fMeLwiuW8KzaLiW522R3NylvRY"
+          "current_key": "AIzaSyCZq95yiZqdOBFc3PlXVKH4fwHVum5vehc"
         }
       ],
       "services": {

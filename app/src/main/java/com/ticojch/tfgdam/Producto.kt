@@ -1,12 +1,11 @@
 package com.ticojch.tfgdam
 
 data class Producto(
-    val id: Int,
-    val nombre: String,
-    val descripcion: String,
-    val precio: Double,
-    val url_img: String,
-    val id_categoria: Int)
+    val nombre: String = "",
+    val descripcion: String = "",
+    val precio: Double = 0.0,
+    val imgUrl: String = "",
+    val disponible: Boolean = true)
 
 /**
  * id_categoria:

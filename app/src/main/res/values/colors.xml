@@ -6,4 +6,6 @@
     <color name="full_black">#121212</color>
     <color name="gold">#F5B041</color>
     <color name="gray_hint">#494949</color>
+    <color name="green_add">#4CAF50</color>
+
 </resources>

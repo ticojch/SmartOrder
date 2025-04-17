@@ -8,14 +8,14 @@ import androidx.core.view.WindowInsetsCompat
 
 class login : AppCompatActivity() {
 
-    private val btnLogin;
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login);
-    }
-
-    fun setLayout(){
-        btnLogin = findViewById(R.id.btnIniciarSesion);
-    }
+//    private var btnLogin : Button
+//
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        setContentView(R.layout.activity_login);
+//    }
+//
+//    fun setLayout(){
+//        btnLogin = findViewById(R.id.btnIniciarSesion);
+//    }
 }
