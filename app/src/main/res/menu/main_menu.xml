@@ -8,14 +8,14 @@
         app:showAsAction="always"/>
 
     <item
-        android:id="@+id/button_carrito"
-        android:icon="@drawable/prduct_list"
+        android:id="@+id/button_inicio"
+        android:icon="@drawable/menu"
         android:title="ver carrito"
         app:showAsAction="always"/>
 
     <item
-        android:id="@+id/button_inicio"
-        android:icon="@drawable/menu"
+        android:id="@+id/button_carrito"
+        android:icon="@drawable/prduct_list"
         android:title="ver carrito"
         app:showAsAction="always"/>
 </menu>

@@ -101,13 +101,13 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "¡Camarero en camino!", Toast.LENGTH_SHORT).show()
                 true
             }
+            R.id.button_inicio ->{
+                verMenu()
+                true
+            }
             R.id.button_carrito -> {
                 // Acción para abrir el carrito
                 verCarrito()
-                true
-            }
-            R.id.button_inicio ->{
-                verMenu()
                 true
             }
             else -> super.onOptionsItemSelected(item)

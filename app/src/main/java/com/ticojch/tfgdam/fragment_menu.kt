@@ -1,5 +1,6 @@
 package com.ticojch.tfgdam
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -30,7 +31,8 @@ class fragment_menu() : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentMenuBinding.inflate(inflater, container, false)
-        mesaId = arguments?.getString("mesaId")
+        val conf = context?.getSharedPreferences("Parameters", Context.MODE_PRIVATE)
+        mesaId = conf?.getString("mesa_id",null)
         return binding.root
     }
 
@@ -45,37 +47,49 @@ class fragment_menu() : Fragment() {
         val decoration = DividerItemDecoration(context, manager.orientation)
 
         binding.recyclerView.layoutManager = manager
-//        binding.recyclerView.adapter = ProductAdapter(productos, {onItemSelected(it)})
         Log.i("syso","Obteniendo base de datos")
+       cargarMenu()
+
+        binding.recyclerView.addItemDecoration(decoration)
+    }
+
+    fun cargarMenu() {
         db.collection("platos").get()
             .addOnSuccessListener { result ->
                 listaProductos.clear()
-                Log.i("syso",result.toString())
-                Log.d("syso", "Cantidad de documentos: ${result.size()}")
+                Log.i("syso", result.toString())
+
                 for (document in result) {
                     val plato = document.toObject(Producto::class.java)
-                    if(plato.disponible){
+                    if (plato.disponible) {
                         listaProductos.add(plato)
                     }
                 }
-                binding.recyclerView.adapter = ProductAdapter(listaProductos,productosSeleccionados) {
+
+                binding.recyclerView.adapter = ProductAdapter(listaProductos, productosSeleccionados) {
                     for (producto in productosSeleccionados) {
                         val productoMap = mapOf(
                             "nombre" to producto.nombre,
                             "precio" to producto.precio,
-                            "cantidad" to producto.cantidad,
-                            "imgUrl" to producto.imgUrl
+                            "cantidad" to producto.cantidad.toLong(),
+                            "imgUrl" to producto.imgUrl,
+                            "estado" to 0
                         )
-                        db.collection("mesas")
+
+                        val nombreProducto = producto.nombre
+                        val productosRef = db.collection("mesas")
                             .document(mesaId.toString())
                             .collection("productosToSend")
-                            .add(productoMap)
-                            .addOnSuccessListener { documentReference ->
-                                Toast.makeText(
-                                    requireContext(),
-                                    "Producto agregado a mesa correctamente",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                            .document(nombreProducto)
+
+                        productosRef.get()
+                            .addOnSuccessListener { doc ->
+                                if (doc.exists()) {
+                                    val nuevaCantidad =  producto.cantidad
+                                    productosRef.update("cantidad", nuevaCantidad)
+                                } else {
+                                    productosRef.set(productoMap)
+                                }
                             }
                             .addOnFailureListener { e ->
                                 Toast.makeText(
@@ -88,12 +102,89 @@ class fragment_menu() : Fragment() {
                 }
             }
             .addOnFailureListener {
-                Log.i("syso","Error al cargar base de datos")
+                Log.i("syso", "Error al cargar base de datos")
                 Toast.makeText(context, "Error cargando el menú", Toast.LENGTH_SHORT).show()
             }
-
-        binding.recyclerView.addItemDecoration(decoration)
     }
+
+//PRONTO A IMPLEMENTAR ALGORITMO PARA ACTUALIZAR EL MENU SEGUN LA CANTIDAD YA INGRESADA EN EL CARRITO
+    //Cargar Menu desde la base de datos
+//    fun cargarMenu(){
+//        db.collection("platos").get()
+//            .addOnSuccessListener { result ->
+//                listaProductos.clear()
+//                Log.i("syso",result.toString()) //Debug
+//                for (document in result) {
+//                    val plato = document.toObject(Producto::class.java)
+//                    if(plato.disponible){
+//                        listaProductos.add(plato)
+//                    }
+//                }
+//                binding.recyclerView.adapter = ProductAdapter(listaProductos,productosSeleccionados) {
+//                    for (producto in productosSeleccionados) {
+//                        val productoMap = mapOf(
+//                            "nombre" to producto.nombre,
+//                            "precio" to producto.precio,
+//                            "cantidad" to producto.cantidad,
+//                            "imgUrl" to producto.imgUrl,
+//                            "estado" to 0
+//                        )
+//                        addProductosBD(productoMap)
+//                    }
+//                }
+//            }
+//            .addOnFailureListener {
+//                Log.i("syso","Error al cargar base de datos")
+//                Toast.makeText(context, "Error cargando el menú", Toast.LENGTH_SHORT).show()
+//            }
+//    }
+//
+//    //Agregar los platos seleccionados a la collection productosToSend de la mesa configurada
+//    fun addProductosBD(nombreProduct:String):Int{
+//        val cantidad = 0
+//        db.collection("mesas")
+//            .document(mesaId.toString())
+//            .collection("productosToSend").document(nombreProduct.toString())
+//            .get()
+//            .addOnSuccessListener { documentReference ->
+//                if(documentReference.exists()){
+//                    cantidad = documentReference.data.cantidad
+//                }else{
+//                    return 0
+//                }
+//            }
+//            .addOnFailureListener { e ->
+//                Toast.makeText(
+//                    requireContext(),
+//                    "Error al consultar ${e.message}",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//            }
+//
+//        return cantidad;
+//    }
+//
+//    //Verificar que el producto ya haya sido seleccionado
+//    fun verificarProductoSeleccionado(){
+//            db.collection("mesas")
+//                .document(mesaId.toString())
+//                .collection("productosToSend").document(productosMenu["nombre"].toString())
+//                .set(productosMenu)
+//                .addOnSuccessListener { documentReference ->
+//                    Toast.makeText(
+//                        requireContext(),
+//                        "Producto agregado a mesa correctamente",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                }
+//                .addOnFailureListener { e ->
+//                    Toast.makeText(
+//                        requireContext(),
+//                        "Error al agregar producto: ${e.message}",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                }
+//    }
 
     override fun onDestroyView() {
         super.onDestroyView()

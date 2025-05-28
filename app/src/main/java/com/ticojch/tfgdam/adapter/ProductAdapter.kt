@@ -18,12 +18,6 @@ class ProductAdapter(val products:List<Producto>, private val productosSeleccion
         return ProductViewHolder(layoutInflater.inflate(R.layout.item_product, parent, false))
     }
 
-//    override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
-//        val item = products[position]
-//        Log.i("syso","BindViewHolder")
-//        holder.render(item, onTotalChanged())
-//    }
-
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val item = products[position]
 

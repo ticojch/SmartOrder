@@ -1,5 +1,6 @@
 package com.ticojch.tfgdam
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -21,6 +22,7 @@ class CarritoFragment : Fragment() {
 
     private val productosSeleccionados : MutableList<ProductoCarrito> = mutableListOf()
     private var mesaId :String? = null
+    private var totalAPagar = 0.0
 
     val db = Firebase.firestore
 
@@ -30,16 +32,14 @@ class CarritoFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentCarritoBinding.inflate(inflater, container, false)
-        mesaId = arguments?.getString("mesaId")
+        val conf = context?.getSharedPreferences("Parameters", Context.MODE_PRIVATE)
+        mesaId = conf?.getString("mesa_id",null)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
-
-
-
     }
 
     fun initRecyclerView(){
@@ -48,31 +48,54 @@ class CarritoFragment : Fragment() {
         val decoration = DividerItemDecoration(context, manager.orientation)
 
         binding.recyclerViewCarrito.layoutManager = manager
-//        binding.recyclerView.adapter = ProductAdapter(productos, {onItemSelected(it)})
-        Log.i("syso","Obteniendo base de datos")
+        Log.i("syso","Obteniendo base de datos: "+mesaId.toString())
         db.collection("mesas").document(mesaId.toString()).collection("productosToSend").get()
             .addOnSuccessListener { result ->
                 productosSeleccionados.clear()
-                val platosToSend = mutableListOf<ProductoCarrito>()
                 Log.i("syso",result.toString())
-                Log.d("syso", "Cantidad de documentos: ${result.size()}")
                 for (document in result) {
                     val plato = document.toObject(ProductoCarrito::class.java)
                     if(plato.cantidad>0){
-                        platosToSend.add(plato)
+                        productosSeleccionados.add(plato)
                     }
                 }
-                for (plato in platosToSend) {
+                for (plato in productosSeleccionados) {
                     Log.i("syso", "Producto: ${plato.nombre}, Cantidad: ${plato.cantidad}")
                 }
-                binding.recyclerViewCarrito.adapter = CarritoAdapter(platosToSend)
-
+                totalAPagar()
+                binding.recyclerViewCarrito.adapter = CarritoAdapter(productosSeleccionados) { producto ->
+                    //Eliminar el producto del carrito al presionar el boton
+                    db.collection("mesas")
+                        .document(mesaId.toString())
+                        .collection("productosToSend")
+                        .document(producto.nombre)
+                        .delete()
+                        .addOnSuccessListener {
+                            Toast.makeText(requireContext(), "${producto.nombre} eliminado del carrito", Toast.LENGTH_SHORT).show()
+                            initRecyclerView()
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(requireContext(), "Error eliminando producto: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                }
             }
             .addOnFailureListener {
                 Log.i("syso","Error al cargar base de datos")
                 Toast.makeText(context, "Error cargando el menú", Toast.LENGTH_SHORT).show()
             }
         binding.recyclerViewCarrito.addItemDecoration(decoration)
+    }
+
+    fun sendProductsToCocinar(){
+
+    }
+
+    fun totalAPagar(){
+        totalAPagar = 0.0
+        for (product in productosSeleccionados) {
+            this.totalAPagar += (product.precio*product.cantidad)
+        }
+        binding.totalAPagar.text = "${this.totalAPagar}€"
     }
 
     override fun onDestroyView() {
