@@ -86,7 +86,7 @@ class CarritoFragment : Fragment() {
         binding.recyclerViewCarrito.addItemDecoration(decoration)
     }
 
-    fun sendProductsToCocinar(){
+    fun sendProductsToCocinar(){ // POR HACER
 
     }
 
@@ -95,7 +95,7 @@ class CarritoFragment : Fragment() {
         for (product in productosSeleccionados) {
             this.totalAPagar += (product.precio*product.cantidad)
         }
-        binding.totalAPagar.text = "${this.totalAPagar}€"
+        binding.totalAPagar.text = String.format("%.2f",this.totalAPagar)
     }
 
     override fun onDestroyView() {

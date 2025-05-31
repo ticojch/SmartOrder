@@ -35,7 +35,7 @@ class CarritoAdapter(private val productos: MutableList<ProductoCarrito>, privat
         val item = productos[position]
         holder.nombre.text = item.nombre
         holder.cantidad.text = "Cantidad: ${item.cantidad}"
-        holder.total.text = "Total: ${item.precio * item.cantidad} €"
+        holder.total.text = "Total: ${String.format("%.2f", item.precio * item.cantidad)}"
         holder.precio.text = "${item.precio} €"
         Glide.with(holder.itemView.context).load(item.imgUrl).into(holder.imagen)
         holder.eliminar_btn.setOnClickListener {

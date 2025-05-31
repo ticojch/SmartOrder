@@ -20,6 +20,7 @@ class ProductAdapter(val products:List<Producto>, private val productosSeleccion
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val item = products[position]
+        Log.i("ProductAdapter", item.nombre+" "+item.cantidad.toString())
 
         holder.render(item) { productoAgregado, cantidadSeleccionada ->
 

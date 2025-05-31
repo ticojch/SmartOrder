@@ -1,16 +1,10 @@
 package com.ticojch.tfgdam
 
-data class Producto(
-    val nombre: String = "",
-    val descripcion: String = "",
-    val precio: Double = 0.0,
-    val imgUrl: String = "",
-    val disponible: Boolean = true)
+class Producto(
+    var nombre: String = "",
+    var descripcion: String = "",
+    var precio: Double = 0.0,
+    var imgUrl: String = "",
+    var disponible: Boolean = true, var cantidad: Int = 0){
+}
 
-/**
- * id_categoria:
- * 0 - Entrantes
- * 1 - Arroces
- * 2 - Pollos
- * 3 - Bebidas
- * **/

@@ -14,6 +14,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.ticojch.tfgdam.adapter.ProductAdapter
 import com.ticojch.tfgdam.databinding.FragmentMenuBinding
+import javax.security.auth.callback.Callback
 
 
 class fragment_menu() : Fragment() {
@@ -59,45 +60,58 @@ class fragment_menu() : Fragment() {
                 listaProductos.clear()
                 Log.i("syso", result.toString())
 
-                for (document in result) {
-                    val plato = document.toObject(Producto::class.java)
-                    if (plato.disponible) {
-                        listaProductos.add(plato)
-                    }
+                val platosDisponibles = result.filter { it.toObject(Producto::class.java).disponible }
+                var platosProcesados = 0
+
+                if (platosDisponibles.isEmpty()) {
+                    binding.recyclerView.adapter = ProductAdapter(listaProductos, productosSeleccionados) { /* vacío */ }
+                    return@addOnSuccessListener
                 }
 
-                binding.recyclerView.adapter = ProductAdapter(listaProductos, productosSeleccionados) {
-                    for (producto in productosSeleccionados) {
-                        val productoMap = mapOf(
-                            "nombre" to producto.nombre,
-                            "precio" to producto.precio,
-                            "cantidad" to producto.cantidad.toLong(),
-                            "imgUrl" to producto.imgUrl,
-                            "estado" to 0
-                        )
+                for (document in platosDisponibles) {
+                    val plato = document.toObject(Producto::class.java)
 
-                        val nombreProducto = producto.nombre
-                        val productosRef = db.collection("mesas")
-                            .document(mesaId.toString())
-                            .collection("productosToSend")
-                            .document(nombreProducto)
+                    devolverCantidadProductoSeleccionado(plato.nombre.toString()) { cantidad ->
+                        plato.cantidad = cantidad
+                        listaProductos.add(plato)
+                        platosProcesados++
 
-                        productosRef.get()
-                            .addOnSuccessListener { doc ->
-                                if (doc.exists()) {
-                                    val nuevaCantidad =  producto.cantidad
-                                    productosRef.update("cantidad", nuevaCantidad)
-                                } else {
-                                    productosRef.set(productoMap)
+                        if (platosProcesados == platosDisponibles.size) {
+
+                            // Funcion asincrona, cuando se procesaron todos, se mostrara RecyclerView
+                            binding.recyclerView.adapter = ProductAdapter(listaProductos, productosSeleccionados) {
+                                for (producto in productosSeleccionados) {
+                                    val productoMap = mapOf(
+                                        "nombre" to producto.nombre,
+                                        "precio" to producto.precio,
+                                        "cantidad" to producto.cantidad.toLong(),
+                                        "imgUrl" to producto.imgUrl,
+                                        "estado" to 0
+                                    )
+
+                                    val productosRef = db.collection("mesas")
+                                        .document(mesaId.toString())
+                                        .collection("productosToSend")
+                                        .document(producto.nombre)
+
+                                    productosRef.get()
+                                        .addOnSuccessListener { doc ->
+                                            if (doc.exists()) {
+                                                productosRef.update("cantidad", producto.cantidad)
+                                            } else {
+                                                productosRef.set(productoMap)
+                                            }
+                                        }
+                                        .addOnFailureListener { e ->
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "Error al agregar producto: ${e.message}",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
                                 }
                             }
-                            .addOnFailureListener { e ->
-                                Toast.makeText(
-                                    requireContext(),
-                                    "Error al agregar producto: ${e.message}",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+                        }
                     }
                 }
             }
@@ -107,84 +121,26 @@ class fragment_menu() : Fragment() {
             }
     }
 
-//PRONTO A IMPLEMENTAR ALGORITMO PARA ACTUALIZAR EL MENU SEGUN LA CANTIDAD YA INGRESADA EN EL CARRITO
-    //Cargar Menu desde la base de datos
-//    fun cargarMenu(){
-//        db.collection("platos").get()
-//            .addOnSuccessListener { result ->
-//                listaProductos.clear()
-//                Log.i("syso",result.toString()) //Debug
-//                for (document in result) {
-//                    val plato = document.toObject(Producto::class.java)
-//                    if(plato.disponible){
-//                        listaProductos.add(plato)
-//                    }
-//                }
-//                binding.recyclerView.adapter = ProductAdapter(listaProductos,productosSeleccionados) {
-//                    for (producto in productosSeleccionados) {
-//                        val productoMap = mapOf(
-//                            "nombre" to producto.nombre,
-//                            "precio" to producto.precio,
-//                            "cantidad" to producto.cantidad,
-//                            "imgUrl" to producto.imgUrl,
-//                            "estado" to 0
-//                        )
-//                        addProductosBD(productoMap)
-//                    }
-//                }
-//            }
-//            .addOnFailureListener {
-//                Log.i("syso","Error al cargar base de datos")
-//                Toast.makeText(context, "Error cargando el menú", Toast.LENGTH_SHORT).show()
-//            }
-//    }
-//
-//    //Agregar los platos seleccionados a la collection productosToSend de la mesa configurada
-//    fun addProductosBD(nombreProduct:String):Int{
-//        val cantidad = 0
-//        db.collection("mesas")
-//            .document(mesaId.toString())
-//            .collection("productosToSend").document(nombreProduct.toString())
-//            .get()
-//            .addOnSuccessListener { documentReference ->
-//                if(documentReference.exists()){
-//                    cantidad = documentReference.data.cantidad
-//                }else{
-//                    return 0
-//                }
-//            }
-//            .addOnFailureListener { e ->
-//                Toast.makeText(
-//                    requireContext(),
-//                    "Error al consultar ${e.message}",
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//            }
-//
-//        return cantidad;
-//    }
-//
 //    //Verificar que el producto ya haya sido seleccionado
-//    fun verificarProductoSeleccionado(){
-//            db.collection("mesas")
-//                .document(mesaId.toString())
-//                .collection("productosToSend").document(productosMenu["nombre"].toString())
-//                .set(productosMenu)
-//                .addOnSuccessListener { documentReference ->
-//                    Toast.makeText(
-//                        requireContext(),
-//                        "Producto agregado a mesa correctamente",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                }
-//                .addOnFailureListener { e ->
-//                    Toast.makeText(
-//                        requireContext(),
-//                        "Error al agregar producto: ${e.message}",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                }
-//    }
+    fun devolverCantidadProductoSeleccionado(nombrePlato:String, callback:(Int) -> Unit){
+        var cantidad:Int = 0
+        val docRef = db.collection("mesas").document(mesaId.toString()).collection("productosToSend").document(nombrePlato)
+        docRef.get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    cantidad = (documentSnapshot.getLong("cantidad") ?: 0).toInt()
+                    Log.d("Firebase", "Cantidad: $cantidad")
+                    callback(cantidad)
+                }
+                else {
+                    callback(0)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firebase", "Error al consultar: ${e.message}")
+                callback(0)
+            }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
