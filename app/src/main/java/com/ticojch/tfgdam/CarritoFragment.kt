@@ -40,6 +40,10 @@ class CarritoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
+
+        binding.btnConfirmarPedido.setOnClickListener {
+            sendProductsToCocinar()
+        }
     }
 
     fun initRecyclerView(){
@@ -59,7 +63,7 @@ class CarritoFragment : Fragment() {
                         productosSeleccionados.add(plato)
                     }
                 }
-                for (plato in productosSeleccionados) {
+                for (plato in productosSeleccionados) { //Debug
                     Log.i("syso", "Producto: ${plato.nombre}, Cantidad: ${plato.cantidad}")
                 }
                 totalAPagar()
@@ -87,7 +91,56 @@ class CarritoFragment : Fragment() {
     }
 
     fun sendProductsToCocinar(){ // POR HACER
+//        var platosConfirmados = mutableListOf<ProductoCarrito>() CREO QUE NO LO UTILIZARE
 
+        Log.i("syso","Enviando a cocinar")
+
+        //Guarda los platos confirmados en una lista
+        db.collection("mesas").document(mesaId.toString()).collection("productosToSend").get()
+            .addOnSuccessListener { result ->
+                Log.i("syso", result.toString())
+                for (document in result) {
+                    val plato = document.toObject(ProductoCarrito::class.java)
+                    if (plato.cantidad > 0) {
+//                        platosConfirmados.add(plato) CREO QUE NO LO UTILIZARE
+                        anadirProductosConfirmados(plato)
+                        document.reference.delete() //Eliminar producto toSend()
+                    }
+                }
+                productosSeleccionados.clear() //Limpia arreglo local de productos a enviar
+                initRecyclerView()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(requireContext(), "Error al confirmar pedido ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+
+//        return platosConfirmados CREO QUE NO LO UTILIZARE
+    }
+
+    //Anadir productos confirmados a nueva collecion de platos confirmados
+    fun anadirProductosConfirmados(producto: ProductoCarrito){
+        val productosRef = db.collection("mesas")
+            .document(mesaId.toString())
+            .collection("productosConfirmed")
+            .document(producto.nombre)
+
+        productosRef.get()
+            .addOnSuccessListener { doc ->
+                if (doc.exists()) {
+                    val cantidadExistente = doc.getLong("cantidad") ?: 0L
+                    var total = cantidadExistente + producto.cantidad.toLong()
+                    productosRef.update("cantidad", total)
+                } else {
+                    productosRef.set(producto)
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    requireContext(),
+                    "Error al agregar producto: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
     }
 
     fun totalAPagar(){
