@@ -5,15 +5,8 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import android.content.SharedPreferences
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.firestore.ktx.firestore
-import com.ticojch.tfgdam.adapter.ProductAdapter
-import com.ticojch.tfgdam.databinding.ActivityMainBinding
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import android.content.Context
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
@@ -44,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     fun verMenu(){
         Log.i("syso","Iniciando el menu")
-        val fragment = fragment_menu()
+        val fragment = MenuFragment()
         val bundle = Bundle()
         bundle.putString("mesaId",mesaId)
         fragment.arguments = bundle
@@ -89,6 +82,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun verFactura(){
+        Log.i("syso","Iniciando el menu")
+        val fragment = FacturacionFragment()
+        val bundle = Bundle()
+        fragment.arguments = bundle
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_menu, fragment).commit()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
@@ -108,6 +111,11 @@ class MainActivity : AppCompatActivity() {
             R.id.button_carrito -> {
                 // Acción para abrir el carrito
                 verCarrito()
+                true
+            }
+            R.id.button_factura -> {
+                // Acción para abrir el carrito
+                verFactura()
                 true
             }
             else -> super.onOptionsItemSelected(item)

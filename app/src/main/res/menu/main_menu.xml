@@ -8,6 +8,12 @@
         app:showAsAction="always"/>
 
     <item
+        android:id="@+id/button_factura"
+        android:icon="@drawable/bill_logo"
+        android:title="ver factura"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/button_inicio"
         android:icon="@drawable/menu"
         android:title="ver carrito"

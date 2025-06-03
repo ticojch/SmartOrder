@@ -14,10 +14,9 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.ticojch.tfgdam.adapter.ProductAdapter
 import com.ticojch.tfgdam.databinding.FragmentMenuBinding
-import javax.security.auth.callback.Callback
 
 
-class fragment_menu() : Fragment() {
+class MenuFragment() : Fragment() {
     private var _binding: FragmentMenuBinding? = null
     private val binding get() = _binding!!
     private var mesaId :String? = null
@@ -77,38 +76,38 @@ class fragment_menu() : Fragment() {
                         platosProcesados++
 
                         if (platosProcesados == platosDisponibles.size) {
+                            _binding?.let {
+                                it.recyclerView.adapter = ProductAdapter(listaProductos, productosSeleccionados) {
+                                    for (producto in productosSeleccionados) {
+                                        val productoMap = mapOf(
+                                            "nombre" to producto.nombre,
+                                            "precio" to producto.precio,
+                                            "cantidad" to producto.cantidad.toLong(),
+                                            "imgUrl" to producto.imgUrl,
+                                            "estado" to 0
+                                        )
 
-                            // Funcion asincrona, cuando se procesaron todos, se mostrara RecyclerView
-                            binding.recyclerView.adapter = ProductAdapter(listaProductos, productosSeleccionados) {
-                                for (producto in productosSeleccionados) {
-                                    val productoMap = mapOf(
-                                        "nombre" to producto.nombre,
-                                        "precio" to producto.precio,
-                                        "cantidad" to producto.cantidad.toLong(),
-                                        "imgUrl" to producto.imgUrl,
-                                        "estado" to 0
-                                    )
+                                        val productosRef = db.collection("mesas")
+                                            .document(mesaId.toString())
+                                            .collection("productosToSend")
+                                            .document(producto.nombre)
 
-                                    val productosRef = db.collection("mesas")
-                                        .document(mesaId.toString())
-                                        .collection("productosToSend")
-                                        .document(producto.nombre)
-
-                                    productosRef.get()
-                                        .addOnSuccessListener { doc ->
-                                            if (doc.exists()) {
-                                                productosRef.update("cantidad", producto.cantidad)
-                                            } else {
-                                                productosRef.set(productoMap)
+                                        productosRef.get()
+                                            .addOnSuccessListener { doc ->
+                                                if (doc.exists()) {
+                                                    productosRef.update("cantidad", producto.cantidad)
+                                                } else {
+                                                    productosRef.set(productoMap)
+                                                }
                                             }
-                                        }
-                                        .addOnFailureListener { e ->
-                                            Toast.makeText(
-                                                requireContext(),
-                                                "Error al agregar producto: ${e.message}",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
+                                            .addOnFailureListener { e ->
+                                                Toast.makeText(
+                                                    requireContext(),
+                                                    "Error al agregar producto: ${e.message}",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                    }
                                 }
                             }
                         }
