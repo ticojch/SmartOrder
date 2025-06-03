@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.ticojch.tfgdam.adapter.FacturaAdapter
-import com.ticojch.tfgdam.adapter.ProductAdapter
 import com.ticojch.tfgdam.databinding.FragmentFacturacionBinding
 
 class FacturacionFragment : Fragment() {

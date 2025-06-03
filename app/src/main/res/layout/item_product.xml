@@ -7,12 +7,13 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="10dp">
 
         <ImageView
             android:id="@+id/img_product"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:background="@color/black"
@@ -23,7 +24,6 @@
             android:id="@+id/info_container"
             android:layout_width="250dp"
             android:layout_height="match_parent"
-            app:layout_constraintEnd_toStartOf="@+id/img_product"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:padding="10dp">
@@ -58,25 +58,33 @@
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/add_product_btn"
-            android:layout_width="54dp"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:text="+"
             android:layout_marginHorizontal="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:backgroundTint="@color/green_add"
+            android:background="@drawable/bg_btn_add"
+            app:backgroundTint="@null"
+            app:rippleColor="@android:color/transparent"
+            android:padding="0dp"
             />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/sub_product_btn"
-            android:layout_width="54dp"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:text="-"
             android:layout_marginHorizontal="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/add_product_btn"
-            android:backgroundTint="@color/red"
+            android:background="@drawable/bg_btn_less"
+            app:backgroundTint="@null"
+            app:rippleColor="@android:color/transparent"
+            android:padding="0dp"
             />
         <TextView
             android:id="@+id/cant_product"
